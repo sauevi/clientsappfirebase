@@ -5,6 +5,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import Spiner from '../layouts/Spiner';
+import classnames from 'classnames';
 
 /**
  * Class para los detalles del cliente
@@ -57,7 +58,15 @@ class ClientDetail extends Component {
                     </div>
                     <div className="col-sm-6 col-md-4 col-lg-12">
                       <h3 className="pull-right" style={{ color: '#1298AE' }}>
-                        Balance: ${parseFloat(client.balance).toFixed(2)}
+                        Balance:{' '}
+                        <span
+                          className={classnames({
+                            'text-danger': client.balance > 0,
+                            'text-success': client.balance === 0
+                          })}
+                        >
+                          ${parseFloat(client.balance).toFixed(2)}
+                        </span>
                       </h3>
                     </div>
                   </div>
@@ -112,6 +121,10 @@ class ClientDetail extends Component {
     }
   }
 }
+
+ClientDetail.protoTypes = {
+  firestore: PropTypes.object.isRequired
+};
 
 /**
  * De esta forma estamos cogiendo de las propiedads, en la colleccion de clientes y se guarda como cliente
