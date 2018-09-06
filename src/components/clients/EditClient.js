@@ -39,7 +39,7 @@ class EditClient extends Component {
     //update client en firestore
     firestore
       .update({ collection: 'clients', doc: client.id }, updClient)
-      .then()
+      .then(() => this.props.history.push('/'))
       .catch(throws);
   };
 

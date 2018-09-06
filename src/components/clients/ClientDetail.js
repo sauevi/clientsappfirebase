@@ -11,8 +11,67 @@ import classnames from 'classnames';
  * Class para los detalles del cliente
  */
 class ClientDetail extends Component {
+  state = {
+    showBalanceUpdate: false,
+    balanceUpdatAmount: ''
+  };
+
+  onChange = e => this.setState({ [e.target.name]: e.target.value });
+
+  //Update balance
+  onBalanceSubmit = e => {
+    e.preventDefault();
+    const { client, firestore } = this.props;
+    const { balanceUpdatAmount } = this.state;
+    let balanceValue =
+      balanceUpdatAmount === '' ? 0 : parseFloat(balanceUpdatAmount);
+    let reg = new RegExp('^\\d+$');
+    console.log(`valor del regex: ${reg.test(balanceValue)}`);
+    if (!reg.test(balanceValue)) {
+      balanceValue = 0;
+    }
+    const clientUpdate = {
+      balance: balanceValue
+    };
+
+    //update en firestore
+    firestore
+      .update({ collection: 'clients', doc: client.id }, clientUpdate)
+      .then(this.setState({ showBalanceUpdate: false }));
+  };
+
   render() {
     const { client } = this.props;
+    const { showBalanceUpdate, balanceUpdatAmount } = this.state;
+
+    let balanceForm = '';
+
+    if (showBalanceUpdate) {
+      balanceForm = (
+        <form onSubmit={this.onBalanceSubmit}>
+          <div className="input-group">
+            <input
+              type="text"
+              className="form-control"
+              name="balanceUpdatAmount"
+              placeholder="Add new balance"
+              value={balanceUpdatAmount}
+              onChange={this.onChange}
+            />
+            <div className="input-group-append">
+              <input
+                type="submit"
+                value="Update"
+                className="btn btn-outline-dark"
+              />
+            </div>
+          </div>
+        </form>
+      );
+    } else {
+      balanceForm = null;
+    }
+
     if (client) {
       return (
         <div>
@@ -66,8 +125,24 @@ class ClientDetail extends Component {
                           })}
                         >
                           ${parseFloat(client.balance).toFixed(2)}
-                        </span>
+                        </span>{' '}
+                        <small>
+                          <a
+                            href="#!"
+                            onClick={() =>
+                              this.setState({
+                                showBalanceUpdate: !this.state.showBalanceUpdate
+                              })
+                            }
+                          >
+                            <i
+                              className="fas fa-pencil-alt"
+                              style={{ color: '#1298ae' }}
+                            />
+                          </a>
+                        </small>
                       </h3>
+                      {balanceForm}
                     </div>
                   </div>
                 </div>
